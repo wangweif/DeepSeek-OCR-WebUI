@@ -71,11 +71,23 @@ DeepSeek-OCR-WebUI 是一個基於 DeepSeek-OCR 模型的智能圖像識別 Web 
 
 ### 📄 PDF 支援（v3.2 新功能）
 
+DeepSeek-OCR-WebUI 現已支援 PDF 文件上傳！上傳 PDF 文件後，系統會自動將每一頁轉換為獨立的圖片，並保持後續的所有處理邏輯（OCR識別、批量處理等）。
+
+<div align="center">
+
+![PDF 處理截圖](./images/pdf_processing_screenshot.png)
+
+**PDF 上傳並自動轉換為圖片 - 每頁成為獨立的圖片進行處理**
+
+</div>
+
+**核心功能**：
 - **多頁 PDF 轉換**：自動將每頁轉換為獨立的圖片
 - **實時進度顯示**：逐頁顯示轉換進度
 - **拖拽上傳**：支援拖拽上傳 PDF 文件
 - **Find 模式支援**：Find 模式支援 PDF（自動使用第一頁）
 - **格式驗證**：自動文件類型檢測和錯誤提示
+- **無縫集成**：轉換後的圖片與普通圖片遵循相同的處理流程
 
 ### 🌏 ModelScope 自動切換（v3.2 新功能）
 

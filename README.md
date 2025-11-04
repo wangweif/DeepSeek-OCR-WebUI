@@ -72,11 +72,23 @@ DeepSeek-OCR-WebUI is an intelligent image recognition web application based on 
 
 ### 📄 PDF Support (New in v3.2)
 
+DeepSeek-OCR-WebUI now supports PDF file uploads! When you upload a PDF file, it automatically converts each page to a separate image, maintaining all subsequent processing logic (OCR recognition, batch processing, etc.).
+
+<div align="center">
+
+![PDF Processing Screenshot](./images/pdf_processing_screenshot.png)
+
+**PDF upload and automatic conversion to images - Each page becomes a separate image for processing**
+
+</div>
+
+**Key Features**:
 - **Multi-page PDF Conversion**: Automatically converts each page to a separate image
 - **Real-time Progress**: Shows conversion progress page by page
 - **Drag & Drop**: Support drag & drop PDF upload
 - **Find Mode**: PDF support in Find mode (uses first page automatically)
 - **Format Validation**: Automatic file type detection and error prompts
+- **Seamless Integration**: Converted images follow the same processing pipeline as regular images
 
 ### 🌏 ModelScope Auto-Fallback (New in v3.2)
 
