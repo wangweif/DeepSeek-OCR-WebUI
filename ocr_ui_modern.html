@@ -892,6 +892,45 @@
             color: var(--dark);
         }
 
+        /* Image Result Styles */
+        .image-result-section {
+            margin-bottom: 25px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: white;
+        }
+
+        .image-result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .image-result-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1em;
+        }
+
+        .image-result-container {
+            padding: 20px;
+            text-align: center;
+            background: #fafbfc;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85em;
+            border-radius: 6px;
+        }
+
         .result-empty {
             text-align: center;
             padding: 60px;
@@ -1470,6 +1509,26 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- Image Result Area (带红色框的图像) -->
+                <div class="image-result-section" id="imageResultSection" style="display: none;">
+                    <div class="image-result-header">
+                        <div class="image-result-title">
+                            <span>🎨</span>
+                            <span>Image Result (智能标注)</span>
+                        </div>
+                        <div class="image-result-toggle">
+                            <button class="btn btn-small btn-secondary" id="toggleImageResult">
+                                <span>👁️</span>
+                                <span>切换显示</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="image-result-container">
+                        <img id="imageResultDisplay" alt="Image Result" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                    </div>
+                </div>
+
                 <div class="result-text" id="resultText"></div>
             </div>
 
@@ -2852,6 +2911,10 @@
             // 可选：添加 grounding 参数
             formData.append('grounding', state.mode === 'find' || state.mode === 'document' || state.mode === 'ocr');
 
+            // 添加 Image Result 功能 - 启用边界框可视化
+            const showImageResult = state.mode === 'find' || state.mode === 'document' || state.mode === 'ocr' || state.mode === 'figure';
+            formData.append('show_image_result', showImageResult);
+
             const response = await fetch(`${CONFIG.apiUrl}/ocr`, {
                 method: 'POST',
                 body: formData
@@ -2867,6 +2930,11 @@
             if (data.boxes && data.boxes.length > 0) {
                 image.boxes = data.boxes;
                 image.imageDims = data.image_dims;
+            }
+
+            // 保存 Image Result (带红色框的图像)
+            if (data.image_result) {
+                image.imageResult = data.image_result;
             }
 
             return data.text;
@@ -3038,7 +3106,7 @@
         // Show Result
         function showResult() {
             elements.resultSection.classList.add('active');
-            
+
             if (state.results.length === 0) {
                 elements.resultText.innerHTML = `
                     <div class="result-empty">
@@ -3046,8 +3114,12 @@
                         <div>暂无识别结果</div>
                     </div>
                 `;
+                document.getElementById('imageResultSection').style.display = 'none';
                 return;
             }
+
+            // 显示Image Result（如果有）
+            showImageResult();
 
             // Merge results with separators
             const mergedText = state.results.map((result, index) => {
@@ -3056,6 +3128,35 @@
             }).join('\n');
 
             elements.resultText.textContent = mergedText;
+        }
+
+        // 显示Image Result的函数
+        function showImageResult() {
+            const imageResultSection = document.getElementById('imageResultSection');
+            const imageResultDisplay = document.getElementById('imageResultDisplay');
+
+            // 查找第一个有Image Result的图片
+            const firstImageWithResult = state.images.find(img => img.imageResult);
+
+            if (firstImageWithResult) {
+                console.log('🎨 显示Image Result');
+                imageResultDisplay.src = firstImageWithResult.imageResult;
+                imageResultSection.style.display = 'block';
+
+                // 添加切换按钮事件
+                const toggleBtn = document.getElementById('toggleImageResult');
+                toggleBtn.onclick = () => {
+                    if (imageResultSection.style.display === 'none') {
+                        imageResultSection.style.display = 'block';
+                        toggleBtn.innerHTML = '<span>👁️</span><span>隐藏显示</span>';
+                    } else {
+                        imageResultSection.style.display = 'none';
+                        toggleBtn.innerHTML = '<span>👁️</span><span>切换显示</span>';
+                    }
+                };
+            } else {
+                imageResultSection.style.display = 'none';
+            }
         }
 
         // Copy Result
@@ -3457,7 +3558,8 @@
                 formData.append('prompt_type', 'find');
                 formData.append('find_term', findTerm);
                 formData.append('grounding', true);
-                
+                formData.append('show_image_result', true);  // 启用Image Result功能
+
                 const response = await fetch(`${CONFIG.apiUrl}/ocr`, {
                     method: 'POST',
                     body: formData
@@ -3490,37 +3592,50 @@
             // 显示结果图片
             const resultImg = document.getElementById('findResultImage');
             const resultCanvas = document.getElementById('findResultCanvas');
-            resultImg.src = findState.imageData;
-            
-            // 等待图片加载后绘制边界框
-            resultImg.onload = () => {
-                // 使用 requestAnimationFrame 确保图片已经渲染
-                requestAnimationFrame(() => {
-                    setTimeout(() => {
-                        if (data.boxes && data.boxes.length > 0) {
-                            drawFindBoundingBoxes(resultImg, resultCanvas, data.boxes, data.image_dims);
-                        } else {
-                            // 清空 canvas
-                            const ctx = resultCanvas.getContext('2d');
-                            resultCanvas.width = resultImg.offsetWidth;
-                            resultCanvas.height = resultImg.offsetHeight;
-                            resultCanvas.style.width = resultImg.offsetWidth + 'px';
-                            resultCanvas.style.height = resultImg.offsetHeight + 'px';
-                            ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
-                        }
-                    }, 50);
-                });
-            };
-            
-            // 如果图片已经加载（来自缓存），立即绘制
-            if (resultImg.complete && resultImg.naturalWidth > 0) {
-                requestAnimationFrame(() => {
-                    setTimeout(() => {
-                        if (data.boxes && data.boxes.length > 0) {
-                            drawFindBoundingBoxes(resultImg, resultCanvas, data.boxes, data.image_dims);
-                        }
-                    }, 50);
-                });
+
+            // 优先使用后端返回的带红色框的图像
+            if (data.image_result) {
+                console.log('🎨 使用后端生成的Image Result');
+                resultImg.src = data.image_result;
+
+                // 清空canvas，因为后端已经绘制了红色框
+                resultCanvas.style.display = 'none';
+            } else {
+                // 否则使用原始图像+前端绘制
+                console.log('🎨 使用前端绘制边界框');
+                resultImg.src = findState.imageData;
+                resultCanvas.style.display = 'block';
+
+                // 等待图片加载后绘制边界框
+                resultImg.onload = () => {
+                    // 使用 requestAnimationFrame 确保图片已经渲染
+                    requestAnimationFrame(() => {
+                        setTimeout(() => {
+                            if (data.boxes && data.boxes.length > 0) {
+                                drawFindBoundingBoxes(resultImg, resultCanvas, data.boxes, data.image_dims);
+                            } else {
+                                // 清空 canvas
+                                const ctx = resultCanvas.getContext('2d');
+                                resultCanvas.width = resultImg.offsetWidth;
+                                resultCanvas.height = resultImg.offsetHeight;
+                                resultCanvas.style.width = resultImg.offsetWidth + 'px';
+                                resultCanvas.style.height = resultImg.offsetHeight + 'px';
+                                ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+                            }
+                        }, 50);
+                    });
+                };
+
+                // 如果图片已经加载（来自缓存），立即绘制
+                if (resultImg.complete && resultImg.naturalWidth > 0) {
+                    requestAnimationFrame(() => {
+                        setTimeout(() => {
+                            if (data.boxes && data.boxes.length > 0) {
+                                drawFindBoundingBoxes(resultImg, resultCanvas, data.boxes, data.image_dims);
+                            }
+                        }, 50);
+                    });
+                }
             }
             
             // 显示统计信息

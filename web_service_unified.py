@@ -19,7 +19,7 @@ from pathlib import Path
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageDraw, ImageFont
 import uvicorn
 import fitz
 
@@ -120,15 +120,16 @@ app.add_middleware(
 def build_prompt(mode: str, custom_prompt: str = "", find_term: str = "") -> str:
     """Build prompt based on mode"""
     templates = {
-        "document": "<image>\n<|grounding|>Convert the document to markdown.",
-        "ocr": "<image>\n<|grounding|>OCR this image.",
+        "document": "<image>\n<|grounding|>Convert the document to markdown and locate all text blocks.",
+        "ocr": "<image>\n<|grounding|>OCR this image and locate all text regions.",
         "free": "<image>\nFree OCR. Only output the raw text.",
-        "figure": "<image>\nParse the figure.",
+        "figure": "<image>\n<|grounding|>Parse the figure and locate all elements.",
         "describe": "<image>\nDescribe this image in detail.",
         "find": "<image>\n<|grounding|>Locate <|ref|>{term}<|/ref|> in the image.",
+        "locate": "<image>\n<|grounding|>Locate all text blocks and elements in the image.",
         "freeform": "<image>\n{prompt}",
     }
-    
+
     if mode == "find":
         return templates["find"].replace("{term}", find_term.strip() or "Total")
     elif mode == "freeform":
@@ -173,6 +174,64 @@ def parse_detections(text: str, image_width: int, image_height: int) -> List[Dic
     
     return boxes
 
+def draw_bounding_boxes(image_path: str, boxes: List[Dict[str, Any]],
+                       box_color: str = "red", box_width: int = 3,
+                       label_color: str = "white", label_bg_color: str = "red") -> str:
+    """
+    Draw bounding boxes on image and return base64 encoded result
+    """
+    try:
+        # Open image
+        with Image.open(image_path) as img:
+            img = ImageOps.exif_transpose(img).convert('RGB')
+            draw = ImageDraw.Draw(img)
+
+            # Try to load a font, fallback to default if not available
+            try:
+                font = ImageFont.truetype("arial.ttf", 16)
+            except:
+                try:
+                    font = ImageFont.truetype("/System/Library/Fonts/Arial.ttf", 16)
+                except:
+                    font = ImageFont.load_default()
+
+            for box_info in boxes:
+                box = box_info["box"]
+                label = box_info.get("label", "")
+
+                if len(box) == 4:
+                    x1, y1, x2, y2 = box
+
+                    # Draw rectangle
+                    draw.rectangle([x1, y1, x2, y2], outline=box_color, width=box_width)
+
+                    # Draw label if available
+                    if label:
+                        # Calculate text size
+                        bbox = draw.textbbox((0, 0), label, font=font)
+                        text_width = bbox[2] - bbox[0]
+                        text_height = bbox[3] - bbox[1]
+
+                        # Draw label background
+                        label_x = x1
+                        label_y = max(0, y1 - text_height - 4)
+                        draw.rectangle([label_x, label_y, label_x + text_width + 8, label_y + text_height + 4],
+                                     fill=label_bg_color)
+
+                        # Draw label text
+                        draw.text((label_x + 4, label_y + 2), label, fill=label_color, font=font)
+
+            # Convert to base64
+            img_buffer = io.BytesIO()
+            img.save(img_buffer, format='PNG', optimize=True)
+            img_base64 = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
+
+            return f"data:image/png;base64,{img_base64}"
+
+    except Exception as e:
+        print(f"Error drawing bounding boxes: {e}")
+        return None
+
 @app.get("/", response_class=HTMLResponse)
 async def root():
     """Return Web UI"""
@@ -198,7 +257,7 @@ async def ocr_endpoint(
     prompt_type: str = Form("document"),
     find_term: str = Form(""),
     custom_prompt: str = Form(""),
-    grounding: bool = Form(False)
+    show_image_result: bool = Form(False)
 ):
     """OCR endpoint"""
     if backend is None:
@@ -231,18 +290,25 @@ async def ocr_endpoint(
         display_text = clean_grounding_text(text)
         if not display_text and boxes:
             display_text = ", ".join([b["label"] for b in boxes])
-        
+
+        # Generate image with bounding boxes if requested and boxes exist
+        image_result = None
+        if show_image_result and boxes:
+            image_result = draw_bounding_boxes(tmp_file, boxes)
+
         return JSONResponse({
             "success": True,
             "text": display_text,
             "raw_text": text,
             "boxes": boxes,
+            "image_result": image_result,
             "image_dims": {"w": orig_w, "h": orig_h},
             "prompt_type": prompt_type,
             "metadata": {
                 "mode": prompt_type,
                 "backend": backend_type,
-                "has_boxes": len(boxes) > 0
+                "has_boxes": len(boxes) > 0,
+                "image_result_generated": image_result is not None
             }
         })
         
