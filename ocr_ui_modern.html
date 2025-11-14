@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeepSeek OCR - 智能图像识别</title>
+    <title>智能作业识别</title>
     <style>
         :root {
             --primary: #6366f1;
@@ -1239,73 +1239,14 @@
         <!-- Header -->
         <div class="header">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <!-- GitHub Link -->
-                <div style="flex: 1;">
-                    <a href="https://github.com/neosun100/DeepSeek-OCR-WebUI" target="_blank" rel="noopener noreferrer" 
-                       style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; color: white; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.3s ease;"
-                       onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';"
-                       onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-                        </svg>
-                        <span data-i18n="github.starButton">⭐ Star on GitHub</span>
-                    </a>
-                </div>
                 
-                <!-- Title -->
-                <div style="flex: 1; text-align: center;">
-                    <h1>🔍 DeepSeek OCR</h1>
-                </div>
+
                 
-                <!-- Language Switcher -->
-                <div style="flex: 1; text-align: right;">
-                    <select id="languageSwitcher" style="padding: 8px 12px; border-radius: 8px; border: 2px solid rgba(100,100,100,0.3); background: rgba(255,255,255,0.95); color: #333; font-size: 14px; cursor: pointer;">
-                        <option value="zh-CN">🇨🇳 简体中文</option>
-                        <option value="zh-TW">🇹🇼 繁體中文</option>
-                        <option value="en-US">🇺🇸 English</option>
-                        <option value="ja-JP">🇯🇵 日本語</option>
-                    </select>
-                </div>
+
             </div>
-            <p id="headerSubtitle" data-i18n="headerSubtitle">智能图像识别 · 批量处理 · 多模式支持 · 支持 Apple Silicon</p>
+            <p id="headerSubtitle" data-i18n="headerSubtitle">智能作业识别</p>
         </div>
 
-        <!-- Mode Selection (始终可见) -->
-        <div class="main-card" style="margin-bottom: 20px;">
-            <div class="mode-section">
-                <div class="mode-title">选择识别模式（增强版：新增 Find 和 Freeform）</div>
-                <div class="mode-grid">
-                    <div class="mode-option active" data-mode="document">
-                        <span class="mode-icon">📄</span>
-                        <div class="mode-name">文档转Markdown</div>
-                    </div>
-                    <div class="mode-option" data-mode="ocr">
-                        <span class="mode-icon">📝</span>
-                        <div class="mode-name">通用OCR</div>
-                    </div>
-                    <div class="mode-option" data-mode="free">
-                        <span class="mode-icon">📋</span>
-                        <div class="mode-name">纯文本提取</div>
-                    </div>
-                    <div class="mode-option" data-mode="figure">
-                        <span class="mode-icon">📊</span>
-                        <div class="mode-name">图表解析</div>
-                    </div>
-                    <div class="mode-option" data-mode="describe">
-                        <span class="mode-icon">🖼️</span>
-                        <div class="mode-name">图像描述</div>
-                    </div>
-                    <div class="mode-option" data-mode="find">
-                        <span class="mode-icon">🔍</span>
-                        <div class="mode-name">查找定位</div>
-                    </div>
-                    <div class="mode-option" data-mode="freeform">
-                        <span class="mode-icon">✨</span>
-                        <div class="mode-name">自定义提示</div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Find Mode Container (左右分栏布局) -->
         <div class="find-mode-container" id="findModeContainer">
@@ -1548,62 +1489,6 @@
         </div>
         </div> <!-- End of batch-mode-container -->
         
-        <!-- Footer -->
-        <div style="margin-top: 60px; padding: 40px 20px; background: rgba(255,255,255,0.05); border-top: 1px solid rgba(255,255,255,0.1); border-radius: 20px;">
-            <div style="max-width: 1200px; margin: 0 auto;">
-                <!-- GitHub Star Banner -->
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <div style="display: inline-block; padding: 30px 50px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2)); border: 2px solid rgba(255,255,255,0.2); border-radius: 16px; backdrop-filter: blur(10px);">
-                        <div style="font-size: 1.5em; font-weight: 700; color: white; margin-bottom: 15px;" data-i18n="github.bannerTitle">
-                            ⭐ 喜欢这个项目？给我们一个 Star！⭐
-                        </div>
-                        <div style="font-size: 1em; color: rgba(255,255,255,0.8); margin-bottom: 20px;" data-i18n="github.bannerDesc">
-                            如果这个项目对你有帮助，请在 GitHub 上给我们一个 Star 支持一下！
-                        </div>
-                        <a href="https://github.com/neosun100/DeepSeek-OCR-WebUI" target="_blank" rel="noopener noreferrer"
-                           style="display: inline-flex; align-items: center; gap: 12px; padding: 14px 32px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; border-radius: 12px; color: white; text-decoration: none; font-size: 1.1em; font-weight: 600; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); transition: all 0.3s ease;"
-                           onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 20px rgba(99, 102, 241, 0.6)';"
-                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(99, 102, 241, 0.4)';">
-                            <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-                            </svg>
-                            <span data-i18n="github.bannerButton">⭐ 在 GitHub 上给我们 Star</span>
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Footer Links -->
-                <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; margin-bottom: 25px;">
-                    <a href="https://github.com/neosun100/DeepSeek-OCR-WebUI" target="_blank" style="color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.95em; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'" data-i18n="github.linkHome">
-                        🏠 项目主页
-                    </a>
-                    <a href="https://github.com/neosun100/DeepSeek-OCR-WebUI/issues" target="_blank" style="color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.95em; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'" data-i18n="github.linkIssues">
-                        🐛 问题反馈
-                    </a>
-                    <a href="https://github.com/neosun100/DeepSeek-OCR-WebUI/blob/main/README.md" target="_blank" style="color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.95em; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'" data-i18n="github.linkDocs">
-                        📖 使用文档
-                    </a>
-                    <a href="https://github.com/neosun100/DeepSeek-OCR-WebUI/blob/main/CHANGELOG.md" target="_blank" style="color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.95em; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'" data-i18n="github.linkChangelog">
-                        📝 更新日志
-                    </a>
-                </div>
-                
-                <!-- Copyright -->
-                <div style="text-align: center; color: rgba(255,255,255,0.6); font-size: 0.9em; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
-                    <p style="margin: 5px 0;">
-                        <span data-i18n="github.madeWith">Made with ❤️ by</span> <a href="https://github.com/neosun100" target="_blank" style="color: rgba(255,255,255,0.8); text-decoration: none;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">@neosun100</a>
-                    </p>
-                    <p style="margin: 5px 0;">
-                        DeepSeek-OCR-WebUI v3.3.3 | © 2025 | MIT License
-                    </p>
-                    <p style="margin: 10px 0 0 0;">
-                        <a href="https://github.com/deepseek-ai" target="_blank" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85em;" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.6)'" data-i18n="github.poweredBy">
-                            Powered by DeepSeek-OCR
-                        </a>
-                    </p>
-                </div>
-            </div>
-        </div>
         
     </div>
 
@@ -1619,7 +1504,7 @@
         // ====================================
         const translations = {
             'zh-CN': {
-                headerSubtitle: '智能图像识别 · 批量处理 · 多模式支持 · 支持 Apple Silicon',
+                headerSubtitle: '智能作业识别',
                 modeTitle: '选择识别模式（增强版：新增 Find 和 Freeform）',
                 modes: {
                     document: '文档转Markdown',
